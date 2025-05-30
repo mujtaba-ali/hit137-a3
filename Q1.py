@@ -151,7 +151,27 @@ class ImageEditorApp:
         if path:
             cv2.imwrite(path, self.resized_image)
             messagebox.showinfo("Saved", "Image saved successfully.")
+            
+    def resize_image(self, value):
+        # Resize cropped image based on slider
+        if self.cropped_image is None:
+            return
+        percent = int(value)
+        width = int(self.cropped_image.shape[1] * percent / 100)
+        height = int(self.cropped_image.shape[0] * percent / 100)
+        resized = cv2.resize(self.cropped_image, (width, height))
+        self.resized_image = resized
+        self.display_cropped_image(resized)
 
+    def save_image(self):
+        # Save the current resized image to file
+        if self.resized_image is None:
+            messagebox.showerror("Error", "No image to save.")
+            return
+        path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG", "*.png"), ("JPEG", "*.jpg")])
+        if path:
+            cv2.imwrite(path, self.resized_image)
+            messagebox.showinfo("Saved", "Image saved successfully.")
 
 
 
