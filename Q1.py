@@ -173,7 +173,34 @@ class ImageEditorApp:
             cv2.imwrite(path, self.resized_image)
             messagebox.showinfo("Saved", "Image saved successfully.")
 
+def apply_edge(self):
+        # Apply Canny edge detection
+        if self.resized_image is not None:
+            gray = cv2.cvtColor(self.resized_image, cv2.COLOR_BGR2GRAY)
+            edges = cv2.Canny(gray, 100, 200)
+            edge_bgr = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
+            self.push_undo(self.resized_image.copy())
+            self.resized_image = edge_bgr
+            self.display_cropped_image(self.resized_image)
 
+    def push_undo(self, image):
+        # Save state for undo and clear redo stack
+        self.undo_stack.append(image)
+        self.redo_stack.clear()
+
+    def undo(self):
+        # Revert to previous state if possible
+        if len(self.undo_stack) > 1:
+            self.redo_stack.append(self.undo_stack.pop())
+            self.resized_image = self.undo_stack[-1].copy()
+            self.display_cropped_image(self.resized_image)
+
+    def redo(self):
+        # Redo the last undone action
+        if self.redo_stack:
+            self.resized_image = self.redo_stack.pop()
+            self.undo_stack.append(self.resized_image.copy())
+            self.display_cropped_image(self.resized_image)
 
 # Main execution
 if __name__ == "__main__":
